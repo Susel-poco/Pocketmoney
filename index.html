@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="PocketMoney">
+<title>PocketMoney</title>
+<style>
+:root{--bg:#f7f6fb;--card:#fff;--tx:#1c1b22;--mut:#77757f;--pri:#6c4df6;--grn:#2e9e5b;--red:#e5484d;--track:#e3e0f0;--okbg:#e6f7ec;--badbg:#fde8e8;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121217;--card:#1e1e26;--tx:#f1f0f6;--mut:#a09eab;--track:#33323d;--okbg:#17321f;--badbg:#3a1c1e}}
+:root[data-theme="dark"]{--bg:#121217;--card:#1e1e26;--tx:#f1f0f6;--mut:#a09eab;--track:#33323d;--okbg:#17321f;--badbg:#3a1c1e}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
+#app{padding:16px 16px 100px;max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+h1{margin:6px 0 0;font-size:26px;font-weight:800}h2{margin:6px 0 0;font-size:20px}
+.card{background:var(--card);border-radius:20px;padding:16px;box-shadow:0 1px 3px #0001}
+.hero{background:var(--pri);color:#fff;border-radius:24px;padding:20px}
+.hero .big{font-size:44px;font-weight:800;margin:2px 0}.mut{color:var(--mut);font-size:13px}.hero .mut{color:#fffc;font-size:16px}
+.row{display:flex;gap:12px;align-items:center}
+.btn{flex:1;border:0;border-radius:16px;padding:16px;font-size:18px;font-weight:700;color:#fff;background:var(--pri);font-family:inherit;text-align:center}
+.btn.grn{background:var(--grn)}.btn.red{background:var(--red)}
+.btn.out{background:none;color:var(--pri);border:1.5px solid var(--pri);font-size:15px;padding:11px 14px}
+.btn.del{background:none;color:var(--red);border:1.5px solid var(--red);font-size:15px;padding:11px 14px}
+.btn:disabled{opacity:.4}
+input[type=text],input[type=number]{width:100%;font-size:17px;padding:13px;border-radius:12px;border:1.5px solid var(--track);background:var(--bg);color:var(--tx);font-family:inherit}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0}
+.chip{white-space:nowrap;border:1.5px solid var(--track);background:none;color:var(--tx);border-radius:999px;padding:8px 14px;font-size:15px;font-family:inherit}
+.chip.on{background:var(--pri);border-color:var(--pri);color:#fff}
+.gimg{height:110px;border-radius:16px;background:linear-gradient(90deg,#8e7bff,#ff8ad8) center/cover;display:flex;align-items:center;justify-content:center;font-size:56px;margin-bottom:12px}
+.bar{height:14px;border-radius:9px;background:var(--track);overflow:hidden;margin:10px 0}.bar i{display:block;height:100%;background:var(--grn)}
+.li{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--track)}.li:last-child{border:0}
+.li .e{font-size:26px}.li .t{flex:1}.li .t small{display:block;color:var(--mut)}.pos{color:var(--grn)}.neg{color:var(--red)}
+.day{color:var(--mut);font-weight:600;margin-top:6px}
+.res{border-radius:24px;padding:20px;background:var(--okbg)}.res .b{font-size:30px;font-weight:800;color:var(--grn);margin:6px 0}
+.q{font-size:22px;font-weight:700;margin:10px 0 16px}
+.stop{text-align:center;border-radius:24px;padding:24px}.stop.bad{background:var(--badbg)}.stop.ok{background:var(--okbg)}
+.rule{display:flex;gap:14px;align-items:center;margin-top:12px}.badge{flex:none;width:64px;height:64px;border-radius:50%;color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:14px;text-align:center}
+.rule b{display:block;margin-bottom:3px}.rule span{font-size:13px;color:var(--mut)}
+summary{font-weight:700;font-size:16px;padding:4px 0}
+.legend{display:flex;align-items:center;gap:8px;padding:3px 0}.dot{width:14px;height:14px;border-radius:50%}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--card);border-top:1px solid var(--track);padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px))}
+nav button{flex:1;border:0;background:none;color:var(--mut);font-size:11px;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:2px}
+nav button span{font-size:22px}nav button.on{color:var(--pri);font-weight:700}
+#modal{position:fixed;inset:0;background:#0008;display:none;align-items:flex-end;justify-content:center;z-index:9}
+#modal.open{display:flex}#modal .sheet{background:var(--card);width:100%;max-width:560px;max-height:92vh;overflow:auto;border-radius:24px 24px 0 0;padding:20px 20px calc(20px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:12px}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(90px + env(safe-area-inset-bottom,0px));background:#222;color:#fff;padding:10px 18px;border-radius:999px;font-size:14px;z-index:20;display:none;max-width:90%}
+input[type=range]{width:100%;accent-color:var(--pri)}
+</style></head>
+<body><div id="app"></div><nav id="nav"></nav><div id="toast"></div><div id="modal" onclick="if(event.target===this)closeM()"></div>
+<script>
+const $=s=>document.querySelector(s),DAY=864e5;
+const CATS=[['🍔','Еда'],['🎮','Игры'],['🚌','Транспорт'],['🎁','Другое']];
+const COL=['#ff8a3d','#6c4df6','#26c6da','#ec407a','#66bb6a'];
+const emo=c=>c=='Доход'?'💰':c=='Мечта'?'⭐':(CATS.find(x=>x[1]==c)||['🎁'])[0];
+const rub=n=>(n<0?'−':'')+Math.abs(n).toLocaleString('ru-RU').replace(/\s/g,'\u00a0')+'\u00a0₽';
+const sr=n=>(n>0?'+':'')+rub(n);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const dayStart=t=>{const d=new Date(t);d.setHours(0,0,0,0);return +d};
+const wk=n=>{const a=n%10,b=n%100;return a==1&&b!=11?'неделя':(a>=2&&a<=4&&(b<12||b>14))?'недели':'недель'};
+const mo=n=>n==1?'месяц':n<5?'месяца':'месяцев';
+const nid=a=>Math.max(0,...a.map(x=>x.id))+1;
+let S;
+const save=()=>{try{localStorage.setItem('pm2',JSON.stringify(S))}catch(e){toast('Не хватило места для сохранения. Попробуй фото поменьше.')}};
+try{S=JSON.parse(localStorage.getItem('pm2'))}catch(e){}
+if(!S){let o=null;try{o=JSON.parse(localStorage.getItem('pm'))}catch(e){}
+S={tx:o&&o.tx?o.tx.filter(x=>x.id>6):[],goals:[],theme:'auto'};save()}
+const bal=()=>S.tx.reduce((s,x)=>s+x.a,0);
+const today=()=>{const d=dayStart(Date.now());return S.tx.filter(x=>x.t>=d).reduce((s,x)=>s+x.a,0)};
+function addTx(a,c,n){S.tx.push({id:nid(S.tx),a,c,n:n||c,t:Date.now()});S.tx.sort((x,y)=>y.t-x.t);save()}
+function applyTheme(){const r=document.documentElement;if(S.theme=='light'||S.theme=='dark')r.dataset.theme=S.theme;else delete r.dataset.theme}
+const setTheme=t=>{S.theme=t;save();applyTheme();render()};
+
+let tab=0,mc=0,tid=0,gid=0,gi='',step=0,A=[],calc={name:'',price:3000,months:3};
+const TABS=[['🏠','Главная'],['📊','Бюджет'],['🧮','Калькулятор']];
+const go=i=>{tab=i;render();scrollTo(0,0)};
+const M=h=>{$('#modal').innerHTML='<div class="sheet">'+h+'</div>';$('#modal').classList.add('open')};
+let tt;function toast(m){const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(tt);tt=setTimeout(()=>t.style.display='none',2800)}
+function ask(b,fn){if(b.dataset.s){fn();return}b.dataset.t=b.textContent;b.dataset.s=1;b.textContent='Точно удалить?';setTimeout(()=>{b.dataset.s='';b.textContent=b.dataset.t},3000)}
+const closeM=()=>$('#modal').classList.remove('open');
+const chips=(sel,fn)=>'<div class="chips">'+CATS.map((c,i)=>`<button class="chip ${i==sel?'on':''}" onclick="${fn}(${i})">${c[0]} ${c[1]}</button>`).join('')+'</div>';
+const setMc=i=>{mc=i;$('#mch').innerHTML=chips(i,'setMc')};
+
+function goalCard(g){const p=Math.min(1,g.saved/g.target),rem=Math.max(0,g.target-g.saved),w=g.weekly>0?Math.ceil(rem/g.weekly):0;
+return `<div class="card"><div class="gimg" style="${g.img?`background-image:url(${g.img});height:auto;aspect-ratio:2/1`:''}">${g.img?'':'⭐'}</div><b style="font-size:18px">${esc(g.name)}</b>
+<div class="bar"><i style="width:${Math.round(p*100)}%"></i></div>
+<div>${Math.round(p*100)}% · Накоплено ${rub(g.saved)} из ${rub(g.target)}. ${rem?'Осталось '+rub(rem)+(w?' (≈ '+w+' '+wk(w)+')':''):'Цель достигнута! 🎉'}</div>
+<div class="row" style="margin-top:12px"><button class="btn out" ${rem&&bal()>0?'':'disabled'} onclick="openDep(${g.id})">Отложить</button><button class="btn out" onclick="openGoal(${g.id})">✏️ Изменить</button></div></div>`}
+
+const R=[['10 сек','#ff8a3d','Правило 10 секунд','Возьми вещь в руки и 10 секунд просто подержи. Спроси себя: «Зачем мне это?» Нет ответа — положи обратно.'],
+['24 ч','#e5484d','Правило 24 часов','Хочешь что-то незапланированное? Подожди сутки. Если желание не прошло, покупка скорее всего осознанная.'],
+['⏱ = ₽','#6c4df6','Цена в часах работы','Раздели цену на то, сколько ты получаешь в час или в день. Кроссовки за 5 000 ₽ — это 10 часов чьей-то работы.'],
+['10%','#2e9e5b','Плати себе первым','С каждых карманных сразу откладывай 10% в копилку, а уже потом трать остальное.'],
+['📝','#26c6da','Список перед магазином','Запиши, что нужно купить, до того как зайдёшь в магазин. Всё, чего нет в списке, — под правило 24 часов.']];
+const TH=[['auto','Авто'],['light','☀️ Светлая'],['dark','🌙 Тёмная']];
+
+function dash(){const td=today();
+return `<div class="hero"><div class="mut">Доступно</div><div class="big">${rub(bal())}</div><div>Сегодня: ${td?sr(td):'без движения'}</div></div>
+<div class="row"><button class="btn grn" onclick="openAdd(1)">+ Доход</button><button class="btn red" onclick="openAdd(0)">− Расход</button></div>
+<h2>Мои мечты</h2>
+${S.goals.length?S.goals.map(goalCard).join(''):'<div class="card mut" style="text-align:center">Пока нет целей. Добавь первую мечту 👇</div>'}
+<button class="btn" onclick="openGoal(0)">+ Добавить цель</button>
+<div class="card"><button class="btn red" style="width:100%" onclick="step=0;A=[];quiz()">🛑 Хочу купить прямо сейчас!</button>
+<details style="margin-top:14px"><summary>5 правил умных трат</summary>${R.map(r=>`<div class="rule"><div class="badge" style="background:${r[1]}">${r[0]}</div><div><b>${r[2]}</b><span>${r[3]}</span></div></div>`).join('')}</details></div>
+<div class="card"><b>Тема оформления</b><div class="chips" style="margin-top:10px">${TH.map(t=>`<button class="chip ${S.theme==t[0]?'on':''}" onclick="setTheme('${t[0]}')">${t[1]}</button>`).join('')}</div></div>`}
+
+const Q=['Это есть в твоём плане трат?','Будет ли это важно через неделю?','Останутся ли деньги на базовые нужды?'];
+function quiz(){if(step<3)return M(`<div class="mut">Вопрос ${step+1} из 3</div><div class="q">${Q[step]}</div><div class="row"><button class="btn grn" onclick="ans(1)">Да</button><button class="btn red" onclick="ans(0)">Нет</button></div>`);
+const bad=A.includes(0);
+M(bad?`<div class="stop bad"><div style="font-size:56px">🛑</div><div class="q neg" style="font-weight:800">Пауза! Подожди 24 часа перед покупкой</div><p>Если завтра захочется так же сильно, возвращайся и проверь ещё раз.</p><button class="btn out" onclick="closeM()">Закрыть</button></div>`
+:`<div class="stop ok"><div style="font-size:56px">✅</div><div class="q pos" style="font-weight:800">Покупка выглядит осознанной</div><p>Всё равно сравни цены в паре мест, прежде чем платить.</p><button class="btn out" onclick="closeM()">Закрыть</button></div>`)}
+const ans=v=>{A.push(v);step++;quiz()};
+
+function openAdd(inc){mc=0;M(`<h2>${inc?'Новый доход':'Новый расход'}</h2><input id="ma" type="number" inputmode="numeric" placeholder="Сумма, ₽"><input id="mn" type="text" placeholder="Заметка">
+${inc?'':'<div id="mch">'+chips(0,'setMc')+'</div>'}<div class="row"><button class="btn out" onclick="closeM()">Отмена</button><button class="btn ${inc?'grn':'red'}" onclick="addM(${inc})">Сохранить</button></div>`)}
+function addM(inc){const a=parseInt($('#ma').value);if(!(a>0))return;addTx(inc?a:-a,inc?'Доход':CATS[mc][1],$('#mn').value.trim());closeM();render()}
+
+function openTx(id){const x=S.tx.find(t=>t.id==id);if(!x)return;tid=id;const ch=x.a<0&&x.c!='Мечта';mc=Math.max(0,CATS.findIndex(c=>c[1]==x.c));
+M(`<h2>Изменить ${x.a>0?'доход':'расход'}</h2><input id="ta" type="number" inputmode="numeric" value="${Math.abs(x.a)}"><input id="tn" type="text" value="${esc(x.n)}">
+${ch?'<div id="mch">'+chips(mc,'setMc')+'</div>':''}<div class="row"><button class="btn del" onclick="ask(this,delTx)">Удалить</button><button class="btn" onclick="saveTx(${ch})">Сохранить</button></div>`)}
+function saveTx(ch){const x=S.tx.find(t=>t.id==tid),a=parseInt($('#ta').value);if(!x||!(a>0))return;
+x.a=x.a<0?-a:a;if(ch)x.c=CATS[mc][1];x.n=$('#tn').value.trim()||x.c;save();closeM();render()}
+function delTx(){S.tx=S.tx.filter(t=>t.id!=tid);save();closeM();render()}
+
+const formVals=()=>({n:$('#gn').value,t:$('#gt').value,s:$('#gs').value});
+function openGoal(id,d){const g=id?S.goals.find(x=>x.id==id):null;gid=id;if(!d)gi=g?g.img||'':'';
+const v=d||{n:g?g.name:'',t:g?g.target:'',s:g?g.saved:''};
+M(`<h2>${g?'Изменить цель':'Новая цель'}</h2><input id="gn" type="text" placeholder="Что хочу купить?" value="${esc(v.n)}">
+<input id="gt" type="number" inputmode="numeric" placeholder="Сколько стоит, ₽" value="${esc(v.t)}">
+<input id="gs" type="number" inputmode="numeric" placeholder="Уже накоплено, ₽ (необязательно)" value="${esc(v.s)}">
+<div class="row"><div class="gimg" id="gp" style="height:80px;flex:1;margin:0"></div><div style="display:flex;flex-direction:column;gap:8px"><label class="btn out" style="flex:none">📷 Фото<input type="file" accept="image/*" hidden onchange="pick(this)"></label><button class="btn del" id="grm" style="flex:none" onclick="gi='';prev()">Убрать</button></div></div>
+<div class="row">${g?'<button class="btn del" onclick="ask(this,delGoal)">Удалить</button>':'<button class="btn out" onclick="closeM()">Отмена</button>'}<button class="btn" onclick="saveGoal()">Сохранить</button></div>`);prev()}
+function prev(){const p=$('#gp');p.style.backgroundImage=gi?`url(${gi})`:'';p.textContent=gi?'':'⭐';$('#grm').style.display=gi?'':'none'}
+function pick(inp){const f=inp.files[0];if(!f)return;const d=formVals(),r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>crop(im,d);im.src=r.result};r.readAsDataURL(f)}
+let C={};
+function crop(im,d){const base=Math.max(600/im.width,300/im.height);C={im,d,base,z:1,x:(600-im.width*base)/2,y:(300-im.height*base)/2,p:new Map(),ld:0};
+M(`<h2>Настрой фото</h2><div class="mut">Двигай пальцем, масштаб — щипком или ползунком</div>
+<canvas id="cc" width="600" height="300" style="width:100%;aspect-ratio:2/1;border-radius:16px;touch-action:none;background:#000"></canvas>
+<div class="row"><span>➖</span><input type="range" id="cz" min="1" max="4" step="0.01" value="1" oninput="zoomTo(+this.value)"><span>➕</span></div>
+<div class="row"><button class="btn out" onclick="openGoal(gid,C.d)">Отмена</button><button class="btn" onclick="cropOk()">Готово</button></div>`);
+const c=$('#cc');
+c.onpointerdown=e=>{c.setPointerCapture(e.pointerId);C.p.set(e.pointerId,[e.clientX,e.clientY]);C.ld=0};
+c.onpointermove=e=>{if(!C.p.has(e.pointerId))return;const k=600/c.getBoundingClientRect().width,o=C.p.get(e.pointerId);C.p.set(e.pointerId,[e.clientX,e.clientY]);
+if(C.p.size==1){C.x+=(e.clientX-o[0])*k;C.y+=(e.clientY-o[1])*k;cdraw()}
+else if(C.p.size==2){const[a,b]=[...C.p.values()],dd=Math.hypot(a[0]-b[0],a[1]-b[1]);if(C.ld)zoomTo(C.z*dd/C.ld);C.ld=dd}};
+c.onpointerup=c.onpointercancel=e=>{C.p.delete(e.pointerId);C.ld=0};
+c.onwheel=e=>{e.preventDefault();zoomTo(C.z*(e.deltaY<0?1.08:.92))};
+cdraw()}
+function zoomTo(z){z=Math.min(4,Math.max(1,z));const s0=C.base*C.z,s1=C.base*z,cx=(300-C.x)/s0,cy=(150-C.y)/s0;C.z=z;C.x=300-cx*s1;C.y=150-cy*s1;$('#cz').value=z;cdraw()}
+function cdraw(){const s=C.base*C.z,w=C.im.width*s,h=C.im.height*s;C.x=Math.min(0,Math.max(600-w,C.x));C.y=Math.min(0,Math.max(300-h,C.y));
+const x=$('#cc').getContext('2d');x.clearRect(0,0,600,300);x.drawImage(C.im,C.x,C.y,w,h)}
+function cropOk(){gi=$('#cc').toDataURL('image/jpeg',.8);openGoal(gid,C.d)}
+function saveGoal(){const n=$('#gn').value.trim(),t=parseInt($('#gt').value),s=parseInt($('#gs').value)||0;if(!n||!(t>0))return toast('Введи название и цену');
+if(gid){const g=S.goals.find(x=>x.id==gid);Object.assign(g,{name:n,target:t,saved:s,img:gi})}else S.goals.push({id:nid(S.goals),name:n,target:t,saved:s,weekly:0,img:gi});
+save();closeM();render()}
+function delGoal(){S.goals=S.goals.filter(x=>x.id!=gid);save();closeM();render()}
+function openDep(id){gid=id;const g=S.goals.find(x=>x.id==id);M(`<h2>Отложить на «${esc(g.name)}»</h2><div class="mut">Доступно: ${rub(bal())}. Деньги спишутся с баланса.</div><input id="da" type="number" inputmode="numeric" placeholder="Сумма, ₽">
+<div class="row"><button class="btn out" onclick="closeM()">Отмена</button><button class="btn" onclick="dep()">Отложить</button></div>`)}
+function dep(){const g=S.goals.find(x=>x.id==gid),a=parseInt($('#da').value);if(!(a>0)||a>bal())return toast('Сумма больше, чем доступно');
+addTx(-a,'Мечта','Отложено на «'+g.name+'»');g.saved+=a;save();closeM();render()}
+
+function budget(){const from=Date.now()-7*DAY,m={};
+S.tx.filter(x=>x.a<0&&x.t>=from).forEach(x=>m[x.c]=(m[x.c]||0)-x.a);
+const d=Object.entries(m).sort((a,b)=>b[1]-a[1]),tot=d.reduce((s,x)=>s+x[1],0),C=2*Math.PI*70;let off=0;
+const arcs=d.map((x,i)=>{const l=C*x[1]/tot,s=`<circle r="70" cx="100" cy="100" fill="none" stroke="${COL[i%5]}" stroke-width="38" stroke-dasharray="${Math.max(l-2,.5)} ${C}" stroke-dashoffset="${-off}" transform="rotate(-90 100 100)"/>`;off+=l;return s}).join('');
+const leg=d.map((x,i)=>`<div class="legend"><span class="dot" style="background:${COL[i%5]}"></span><span style="flex:1">${emo(x[0])} ${esc(x[0])}</span><b>${Math.round(x[1]*100/tot)}% · ${rub(x[1])}</b></div>`).join('');
+const t0=dayStart(Date.now()),days={};S.tx.forEach(x=>{(days[dayStart(x.t)]=days[dayStart(x.t)]||[]).push(x)});
+const list=Object.keys(days).map(Number).sort((a,b)=>b-a).map(k=>{const lb=k==t0?'Сегодня':k==t0-DAY?'Вчера':new Date(k).toLocaleDateString('ru-RU',{day:'numeric',month:'long'});
+return `<div class="day">${lb}</div><div class="card" style="padding:4px 16px">`+days[k].map(x=>`<div class="li" onclick="openTx(${x.id})"><span class="e">${emo(x.c)}</span><div class="t">${esc(x.n)}<small>${esc(x.c)}</small></div><b class="${x.a>0?'pos':'neg'}">${sr(x.a)}</b></div>`).join('')+'</div>'}).join('');
+return `<h1>Мой бюджет</h1><div class="card" style="text-align:center"><b>Куда ушли деньги за неделю</b>${tot?`<div style="position:relative;width:200px;margin:8px auto"><svg viewBox="0 0 200 200">${arcs}</svg><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:700">${rub(tot)}</div></div><div style="text-align:left">${leg}</div>`:'<p>За неделю трат пока нет 🎉</p>'}</div>
+<h2>Операции</h2>${S.tx.length?'<div class="mut">Нажми на операцию, чтобы изменить или удалить</div>'+list:'<div class="card mut" style="text-align:center">Пока нет операций. Добавь первый доход или расход на главной.</div>'}`}
+
+function dream(){return `<h1>Калькулятор мечты</h1>
+<input type="text" placeholder="Что хочу купить?" value="${esc(calc.name)}" oninput="calc.name=this.value;upd()">
+<input type="number" inputmode="numeric" placeholder="Сколько стоит? (₽)" value="${calc.price}" oninput="calc.price=this.value;upd()">
+<div><b id="mlab"></b><input type="range" min="1" max="12" value="${calc.months}" oninput="calc.months=+this.value;upd()"></div>
+<div class="res" id="cres"></div><button class="btn" id="cbtn" onclick="mkGoal()">Добавить в мои цели ⭐</button>`}
+function cv(){const c=parseInt(calc.price)||0,m=calc.months,w=Math.ceil(c/(m*4));return{c,m,w,d:Math.floor(w/7)}}
+function upd(){const{c,m,w,d}=cv();$('#mlab').textContent='Срок: '+m+' '+mo(m);$('#cbtn').disabled=!c;
+$('#cres').innerHTML=c?`Чтобы купить «${esc(calc.name||'вещь')}» через ${m} ${mo(m)},<div class="b">откладывай ${rub(w)} в неделю</div>(или всего ${rub(d)} в день)!`:'Введи стоимость, и я посчитаю 🧮'}
+function mkGoal(){const{c,w}=cv();if(!c)return;S.goals.push({id:nid(S.goals),name:calc.name.trim()||'Моя мечта',target:c,saved:0,weekly:w,img:''});save();go(0)}
+
+function render(){$('#app').innerHTML=[dash,budget,dream][tab]();
+$('#nav').innerHTML=TABS.map((t,i)=>`<button class="${i==tab?'on':''}" onclick="go(${i})"><span>${t[0]}</span>${t[1]}</button>`).join('');
+if(tab==2)upd()}
+applyTheme();render();
+</script></body></html>
